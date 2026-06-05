@@ -11,6 +11,7 @@ async function callGroq(prompt: string, jsonMode = false): Promise<string> {
     body: JSON.stringify({
       model: MODEL,
       messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
       ...(jsonMode && { response_format: { type: 'json_object' } }),
     }),
   })

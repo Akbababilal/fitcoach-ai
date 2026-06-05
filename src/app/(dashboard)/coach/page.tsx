@@ -230,7 +230,7 @@ export default function CoachPage() {
           <p className="text-muted-foreground text-sm">Verilerinizi analiz ederek kişisel öneriler sunar</p>
         </div>
         <Badge variant="secondary" className="ml-auto text-xs">
-          Gemini AI
+          Llama AI
         </Badge>
       </div>
 

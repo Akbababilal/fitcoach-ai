@@ -1,33 +1,30 @@
-const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta'
-const MODEL = 'gemini-2.0-flash'
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
+const MODEL = 'llama-3.3-70b-versatile'
 
-async function callGemini(prompt: string, jsonMode = false): Promise<string> {
-  const apiKey = process.env.GEMINI_API_KEY
-  const url = `${BASE_URL}/models/${MODEL}:generateContent?key=${apiKey}`
-
-  const body = {
-    contents: [{ parts: [{ text: prompt }] }],
-    ...(jsonMode && {
-      generationConfig: { responseMimeType: 'application/json' },
-    }),
-  }
-
-  const res = await fetch(url, {
+async function callGroq(prompt: string, jsonMode = false): Promise<string> {
+  const res = await fetch(GROQ_API_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      ...(jsonMode && { response_format: { type: 'json_object' } }),
+    }),
   })
 
   const data = await res.json()
   if (!res.ok) throw new Error(JSON.stringify(data.error))
-  return data.candidates[0].content.parts[0].text as string
+  return data.choices[0].message.content as string
 }
 
 export async function generateText(prompt: string): Promise<string> {
-  return callGemini(prompt, false)
+  return callGroq(prompt, false)
 }
 
 export async function generateJSON<T>(prompt: string): Promise<T> {
-  const text = await callGemini(prompt, true)
+  const text = await callGroq(prompt, true)
   return JSON.parse(text) as T
 }
